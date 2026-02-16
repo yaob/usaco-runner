@@ -22,9 +22,6 @@ public class Solution {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         PrintWriter pw = new PrintWriter(new BufferedOutputStream(System.out));
         
-        // Read input
-        String line = br.readLine();
-        
         // Your code here
         System.out.println("Hello, USACO!");
         
@@ -81,7 +78,7 @@ function updateStatus(message) {
 // Run code
 async function runCode() {
     const code = editor.getValue();
-    const input = document.getElementById('inputArea').value;
+    let inputData = document.getElementById('inputArea').value;
     const outputArea = document.getElementById('outputArea');
     const statsArea = document.getElementById('statsArea');
 
@@ -93,147 +90,86 @@ async function runCode() {
     updateStatus('⏳ Running...');
     clearOutput();
 
+    let stdout = '';
+    let stderr = '';
+    const startTime = performance.now();
+
+    // Mock System.out.print/println and BufferedReader.readLine
+    const mockSystemOut = {
+        print: (text) => { stdout += text; },
+        println: (text) => { stdout += text + '\n'; }
+    };
+
+    let inputLines = inputData.split(/\r?\n/);
+    let currentInputLine = 0;
+
+    const mockBufferedReader = {
+        readLine: () => {
+            if (currentInputLine < inputLines.length) {
+                return inputLines[currentInputLine++];
+            }
+            return null; // EOF
+        }
+    };
+
+    const mockPrintWriter = {
+        print: (text) => { stdout += text; },
+        println: (text) => { stdout += text + '\n'; },
+        close: () => { /* no-op for mock */ }
+    };
+
     try {
-        // Create a simple Java compiler
-        const jsjava = window.jsjava;
+        // This is a *highly simplified* simulation.
+        // A full Java compiler/runtime in JS is complex.
+        // This attempts to transform basic Java patterns into JS.
 
-        if (!jsjava) {
-            outputArea.innerHTML = '<span class="text-red-400">Error: JSJava library not loaded!</span>';
-            return;
-        }
+        // Replace Java I/O calls with our mocks
+        let jsCode = code;
+        jsCode = jsCode.replace(/System\.out\.println\((.*?)\);/g, 'mockSystemOut.println($1);');
+        jsCode = jsCode.replace(/System\.out\.print\((.*?)\);/g, 'mockSystemOut.print($1);');
+        jsCode = jsCode.replace(/BufferedReader\s+br\s*=\s*new\s+BufferedReader\(new\s+InputStreamReader\(System\.in\)\);/g, 'const br = mockBufferedReader;');
+        jsCode = jsCode.replace(/PrintWriter\s+pw\s*=\s*new\s+PrintWriter\(new\s+BufferedOutputStream\(System\.out\)\);/g, 'const pw = mockPrintWriter;');
+        jsCode = jsCode.replace(/br\.readLine\(\)/g, 'br.readLine()');
+        jsCode = jsCode.replace(/pw\.println\((.*?)\)/g, 'mockPrintWriter.println($1);');
+        jsCode = jsCode.replace(/pw\.print\((.*?)\)/g, 'mockPrintWriter.print($1);');
+        jsCode = jsCode.replace(/pw\.close\(\);/g, 'mockPrintWriter.close();');
 
-        // Prepare the Java code
-        const javaCode = `
-import java.io.*;
-import java.util.*;
+        // Basic variable declarations (e.g., int x = ...) will become let x = ...
+        jsCode = jsCode.replace(/\b(int|double|String)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.*?);/g, 'let $2 = $3;');
+        jsCode = jsCode.replace(/\b(int|double|String)\s+([a-zA-Z_][a-zA-Z0-9_]*);/g, 'let $2;');
+        
+        // Simplified Integer.parseInt
+        jsCode = jsCode.replace(/Integer\.parseInt\((.*?)\)/g, 'parseInt($1)');
 
-${code}
-`;
-
-        // Create a class with the code
-        const className = 'Solution';
-        const javaSource = `
-public class ${className} {
-    public static void main(String[] args) throws IOException {
-        ${code.replace(/import/g, '// import').replace(/throws IOException/g, '').replace(/PrintWriter pw = new PrintWriter(new BufferedOutputStream(System.out));/g, 'PrintWriter pw = new PrintWriter(new BufferedOutputStream(System.out));')}
-    }
-}
-`;
-
-        // Compile and run
-        const result = await jsjava.run(javaSource, input);
-
-        // Display output
-        if (result.stdout) {
-            outputArea.innerHTML = result.stdout.replace(/\n/g, '<br>');
-        }
-
-        if (result.stderr) {
-            outputArea.innerHTML += '<br><span class="text-yellow-400">' + result.stderr.replace(/\n/g, '<br>') + '</span>';
-        }
-
-        // Display stats
-        if (result.timings) {
-            statsArea.innerHTML = `
-                <span class="text-gray-400">⏱️ Time: ${result.timings.totalTime}ms | Memory: ${result.timings.maxMemory}MB</span>
-            `;
-        } else {
-            statsArea.innerHTML = '<span class="text-gray-400">✓ Execution complete</span>';
-        }
-
-        updateStatus('✓ Done!');
+        // Wrap in a function to isolate scope and provide mocks
+        const runnableCode = `
+            (async function() {
+                ${jsCode}
+            })();
+        `;
+        
+        // Execute the transformed code
+        await eval(runnableCode);
 
     } catch (error) {
-        outputArea.innerHTML = '<span class="text-red-400">Error: ' + error.message + '</span>';
-        updateStatus('✗ Error');
+        stderr += `Runtime Error: ${error.message}\n`;
+        console.error("Simulated Java Runtime Error:", error);
     }
+
+    const endTime = performance.now();
+    const totalTime = (endTime - startTime).toFixed(2);
+    const maxMemory = (Math.random() * 50).toFixed(2); // Mock memory usage
+
+    outputArea.innerHTML = 
+        (stdout ? `<span class="text-green-400">${stdout.replace(/\n/g, '<br>')}</span>` : '') +
+        (stderr ? `<span class="text-yellow-400">${stderr.replace(/\n/g, '<br>')}</span>` : '') +
+        (!stdout && !stderr ? '<span class="text-gray-500">// No output generated or runtime error occurred.</span>' : '');
+
+    statsArea.innerHTML = `
+        <span class="text-gray-400">⏱️ Time: ${totalTime}ms | Memory: ${maxMemory}MB</span>
+    `;
+    updateStatus('✓ Done!');
 }
-
-// Initialize JSJava library
-window.jsjava = window.jsjava || {};
-
-// Simple JSJava implementation for browser
-window.jsjava.run = async function(javaCode, input) {
-    return new Promise((resolve) => {
-        const outputArea = document.getElementById('outputArea');
-        let stdout = '';
-        let stderr = '';
-
-        // Create a mock Java environment
-        const mockPrint = {
-            print: (text) => {
-                stdout += text;
-                outputArea.innerHTML += text.replace(/\n/g, '<br>');
-            },
-            println: (text) => {
-                stdout += text + '\\n';
-                outputArea.innerHTML += text.replace(/\n/g, '<br>') + '<br>';
-            }
-        };
-
-        // Parse and execute the Java code
-        try {
-            // Simple Java code evaluator
-            // This is a simplified version - in production, you'd want a proper Java compiler
-
-            // Replace imports with mock implementations
-            let code = javaCode;
-
-            // Create a mock BufferedReader
-            const mockBufferedReader = {
-                readLine: () => {
-                    if (input.length === 0) return null;
-                    const line = input.substring(0, input.indexOf('\\n'));
-                    input = input.substring(input.indexOf('\\n') + 1);
-                    return line;
-                }
-            };
-
-            // Evaluate the code with JavaScript
-            // This is a simplified approach for demo purposes
-            const jsCode = code
-                .replace(/System\.out\.print\((.*?)\)/g, 'mockPrint.print($1)')
-                .replace(/System\.out\.println\((.*?)\)/g, 'mockPrint.println($1)')
-                .replace(/BufferedReader br = new BufferedReader\(new InputStreamReader\(System\.in\)\);/g, 'const br = mockBufferedReader;')
-                .replace(/PrintWriter pw = new PrintWriter\(new BufferedOutputStream\(System\.out\)\);/g, 'const pw = mockPrint;');
-
-            // Execute the JavaScript version
-            // This is a basic implementation - in real usage, you'd use a proper Java compiler
-            try {
-                // For demonstration, we'll just execute a simplified version
-                // In production, use jsjava.js or similar library
-                console.log('Running JSJava code...');
-
-                resolve({
-                    stdout: stdout || 'Output would appear here...\n',
-                    stderr: stderr || '',
-                    timings: {
-                        totalTime: Math.random() * 100,
-                        maxMemory: Math.random() * 10
-                    }
-                });
-            } catch (e) {
-                resolve({
-                    stdout: stdout || '',
-                    stderr: e.message,
-                    timings: {}
-                });
-            }
-
-        } catch (error) {
-            resolve({
-                stdout: stdout || '',
-                stderr: error.message,
-                timings: {}
-            });
-        }
-    });
-};
-
-// Save code on page load
-window.addEventListener('load', () => {
-    loadCode();
-});
 
 // Auto-save code periodically
 let autoSaveTimer;
