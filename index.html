@@ -18,13 +18,16 @@
             min-height: 100vh;
         }
         .CodeMirror {
-            height: 100% !important;
+            height: calc(100vh - 120px) !important;
             font-size: 14px;
             font-family: 'Fira Code', 'Consolas', monospace;
         }
         .usaco-btn {
             background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
             transition: all 0.3s ease;
+            font-size: 14px;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
         }
         .usaco-btn:hover {
             background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
@@ -54,8 +57,8 @@
 
         <!-- Main Content -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Code Editor Panel -->
-            <div class="panel rounded-lg p-4">
+            <!-- Code Editor Panel (Left Column) -->
+            <div class="panel rounded-lg p-4 h-full">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-green-400 font-semibold">📄 Java Code</span>
                     <div class="flex gap-2">
@@ -65,34 +68,37 @@
                     </div>
                 </div>
                 <textarea id="codeEditor"></textarea>
-                <button onclick="runCode()" class="usaco-btn w-full mt-4 py-3 rounded-lg text-white font-bold text-lg">
+                <button onclick="runCode()" class="usaco-btn w-full mt-4 py-2">
                     ⚡ Run Code
                 </button>
             </div>
 
-            <!-- Output Panel -->
-            <div class="panel rounded-lg p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-green-400 font-semibold">📤 Output</span>
-                    <div class="flex gap-2">
-                        <button onclick="clearOutput()" class="text-xs px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-white transition">Clear</button>
-                        <span id="status" class="text-xs text-gray-400">Ready</span>
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Input Panel -->
+                <div class="panel rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-green-400 font-semibold">📥 Input</span>
+                        <button onclick="clearInput()" class="text-xs px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-white transition">Clear Input</button>
                     </div>
+                    <textarea id="inputArea" class="w-full h-32 bg-black/50 rounded p-3 text-green-400 font-mono text-sm border border-gray-700 focus:border-green-500 focus:outline-none resize-none" placeholder="Paste your input here..."></textarea>
                 </div>
-                <div id="outputArea" class="output-area bg-black/50 rounded p-3 min-h-64 h-full overflow-auto text-green-400">
-                    <span class="text-gray-500">// Your output will appear here...</span>
-                </div>
-                <div id="statsArea" class="mt-3 text-xs text-gray-400"></div>
-            </div>
-        </div>
 
-        <!-- Input Panel -->
-        <div class="panel rounded-lg p-4 mt-6">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-green-400 font-semibold">📥 Input</span>
-                <button onclick="clearInput()" class="text-xs px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-white transition">Clear Input</button>
+                <!-- Output Panel -->
+                <div class="panel rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-green-400 font-semibold">📤 Output</span>
+                        <div class="flex gap-2">
+                            <button onclick="clearOutput()" class="text-xs px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-white transition">Clear</button>
+                            <span id="status" class="text-xs text-gray-400">Ready</span>
+                        </div>
+                    </div>
+                    <div id="outputArea" class="output-area bg-black/50 rounded p-3 min-h-64 h-full overflow-auto text-green-400">
+                        <span class="text-gray-500">// Your output will appear here...</span>
+                    </div>
+                    <div id="statsArea" class="mt-3 text-xs text-gray-400"></div>
+                </div>
             </div>
-            <textarea id="inputArea" class="w-full h-32 bg-black/50 rounded p-3 text-green-400 font-mono text-sm border border-gray-700 focus:border-green-500 focus:outline-none resize-none" placeholder="Paste your input here..."></textarea>
         </div>
     </div>
 
