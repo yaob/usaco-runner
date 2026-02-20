@@ -6,80 +6,159 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
             max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
-            background: white;
+            background: #1e1e1e;
             border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            height: calc(100vh - 40px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         h2 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
+            color: #ffffff;
+            margin-bottom: 20px;
             font-size: 28px;
-        }
-
-        .problem-selector {
-            margin-bottom: 25px;
+            margin-top: 0;
+            flex-shrink: 0;
         }
 
         .main-layout {
             display: grid;
             grid-template-columns: 600px 1fr;
-            gap: 30px;
+            gap: 20px;
+            align-items: stretch;
+            flex-grow: 1;
+            min-height: 0;
+            max-height: 800px;
         }
 
         .left-column {
             display: flex;
             flex-direction: column;
+            height: 700px;  /* Fixed height */
+            min-height: 0;
         }
 
         .right-column {
             display: flex;
             flex-direction: column;
+            height: 700px;  /* Fixed height */
+            min-height: 0;
         }
 
         #editor-container {
             width: 100%;
-            height: 700px;
-            border: 2px solid #e0e0e0;
+            height: 100%;  /* Fills left column */
+            border: 2px solid #444;
             border-radius: 10px;
             overflow: hidden;
-        }
-
-        .runtime-input-section {
-            margin: 20px 0;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            background: #fafafa;
-        }
-
-        .output-section {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 25px;
-            background: #fafafa;
-            min-height: 400px;
-            max-height: 700px;
-            overflow-y: auto;
-            flex-grow: 1;
         }
 
         .buttons-container {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin: 20px 0;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            padding-bottom: 10px;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #editor-container {
+            width: 100%;
+            height: 500px;  /* Fixed height for editor */
+            border: 2px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .runtime-input-section {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            padding: 20px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            background: #2d2d2d;
+            margin-bottom: 15px;
+            min-height: 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .runtime-input-section:hover {
+            border-color: #555;
+        }
+
+        .runtime-input-label {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .runtime-input-label span {
+            margin-right: 10px;
+        }
+
+        .runtime-input {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            flex-grow: 1;
+        }
+
+        .runtime-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #252525;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .runtime-input::placeholder {
+            color: #666;
+            font-style: italic;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0 20px 0;
             flex-wrap: wrap;
         }
 
@@ -99,27 +178,67 @@
         .run-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .run-btn:active {
+            transform: translateY(0);
         }
 
         .sample-btn {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
             padding: 10px 20px;
             font-size: 14px;
+        }
+
+        .sample-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
         }
 
         .clear-btn {
             background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
         }
 
-        button:hover {
+        .clear-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
         }
 
-        button:active {
+        .clear-btn:active {
             transform: translateY(0);
+        }
+
+        .output-section {
+            flex-grow: 1;
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 25px;
+            background: #2d2d2d;
+            min-height: 0;
+            max-height: none;
+            overflow-y: auto;
+            transition: border-color 0.3s ease;
+        }
+
+        .output-section:hover {
+            border-color: #555;
+        }
+
+        .output-label {
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+            font-size: 16px;
         }
 
         .output-content {
@@ -128,16 +247,16 @@
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.7;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .error {
-            color: #c62828;
-            background: #ffebee;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
             padding: 15px;
             border-radius: 8px;
             margin: 10px 0;
-            border-left: 4px solid #c62828;
+            border-left: 4px solid #ff6b6b;
         }
 
         .info {
@@ -145,10 +264,16 @@
             font-weight: 500;
         }
 
+        .success {
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+
         .status-message {
             text-align: center;
             padding: 20px;
             font-size: 14px;
+            color: #a0a0a0;
         }
 
         .keyboard-hint {
@@ -163,12 +288,115 @@
         }
 
         .kbd {
-            background: white;
+            background: #3d3d3d;
             padding: 2px 8px;
             border-radius: 4px;
             font-family: monospace;
             font-weight: bold;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+
+        .problem-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .editor-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .editor-language {
+            font-size: 14px;
+            color: #a0a0a0;
+            font-weight: 500;
+        }
+
+        .problem-dropdown-container {
+            margin-bottom: 20px;
+        }
+
+        .problem-dropdown-container label {
+            display: block;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #problemSelect {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        #problemSelect:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Sample button overrides for dark theme */
+        button.sample-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        button.sample-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        /* Clear button overrides for dark theme */
+        button.clear-btn {
+            background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        button.clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .problem-dropdown-container label {
+            display: block;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #problemSelect {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        #problemSelect:focus {
+            outline: none;
+            border-color: #667eea;
         }
     </style>
 </head>
@@ -176,7 +404,7 @@
     <div class="container">
         <h2>🚀 USACO Code Runner - 2 Column Layout</h2>
 
-        <div class="problem-selector">
+        <div class="problem-dropdown-container">
             <label class="input-label">📚 Select USACO Problem:</label>
             <select id="problemSelect" onchange="loadProblem()" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #e0e0e0; border-radius: 8px;">
                 <option value="">-- Select a problem --</option>
@@ -187,11 +415,12 @@
             </select>
         </div>
 
+        <div id="problemTitle" class="problem-title" style="display: none;"></div>
+
         <div class="main-layout">
             <!-- Left Column: Code Editor -->
             <div class="left-column">
                 <div class="input-section">
-                    <label class="input-label">💻 Java Code</label>
                     <div id="editor-container"></div>
                 </div>
             </div>
@@ -202,12 +431,9 @@
                     <label class="runtime-input-label">
                         <span>📝</span> Runtime Input
                     </label>
-                    <textarea id="runtimeInput" class="runtime-input" rows="6" placeholder="Enter input for your Java code (e.g., sample input):
+                    <textarea id="runtimeInput" class="runtime-input" rows="10" placeholder="Enter input for your Java code (e.g., sample input):
 5
 10 4 12 7 15"></textarea>
-                    <div class="runtime-hint">
-                        <span class="keyboard-hint"><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to run</span>
-                    </div>
                 </div>
 
                 <div class="output-section">
@@ -255,7 +481,7 @@ public class Main {
     }
 }`,
                 language: 'java',
-                theme: 'vs-light',
+                theme: 'vs-dark',
                 automaticLayout: true,
                 minimap: { enabled: true },
                 fontSize: 14,
@@ -271,11 +497,13 @@ public class Main {
                 lineNumbersMinChars: 4
             });
 
+            // Allow Ctrl+Enter to run code
             editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
                 runJavaCode();
             });
         });
 
+        // Problem data
         const problems = {
             usaco1: {
                 title: "USACO 1: Maximum Array Value",
@@ -285,6 +513,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+        // Read input
         int n = scanner.nextInt();
 
         int[] array = new int[n];
@@ -292,6 +521,7 @@ public class Main {
             array[i] = scanner.nextInt();
         }
 
+        // Find the maximum
         int max = array[0];
         for (int i = 1; i < n; i++) {
             if (array[i] > max) {
@@ -317,10 +547,12 @@ public class Main {
 
         int max = 0;
 
+        // Try all possible numbers of pails of size X
         for (int i = 0; i <= M / X; i++) {
             int remaining = M - i * X;
             if (remaining < 0) break;
 
+            // Try all possible numbers of pails of size Y
             for (int j = 0; j <= remaining / Y; j++) {
                 int total = i * X + j * Y;
                 if (total <= M && total > max) {
@@ -342,6 +574,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+        // Read the 9 clock positions
         int[] clocks = new int[9];
         for (int i = 0; i < 9; i++) {
             clocks[i] = scanner.nextInt() / 3;
@@ -350,6 +583,7 @@ public class Main {
         int[] moves = new int[9];
         Arrays.fill(moves, -1);
 
+        // BFS to find minimum moves
         int[] dx = {0, 3, 6, 0, 1, 2, 0, 3, 6};
         int[] dy = {3, 0, 0, 1, 1, 1, 2, 2, 2};
 
@@ -413,19 +647,44 @@ public class Main {
         };
 
         const sampleInputs = {
-            usaco1: ["5\n10 4 12 7 15", "3\n1 2 3", "4\n100 1 1 100"],
-            usaco2: ["8 4 24", "3 6 9", "5 3 20"],
-            usaco3: ["0 3 0 3 0 3 0 3 0", "0 0 0 0 0 0 0 0 0", "0 1 0 1 0 1 0 1 0"]
+            usaco1: [
+                "5\n10 4 12 7 15",
+                "3\n1 2 3",
+                "4\n100 1 1 100"
+            ],
+            usaco2: [
+                "8 4 24",
+                "3 6 9",
+                "5 3 20"
+            ],
+            usaco3: [
+                "0 3 0 3 0 3 0 3 0",
+                "0 0 0 0 0 0 0 0 0",
+                "0 1 0 1 0 1 0 1 0"
+            ]
         };
 
         const sampleOutputs = {
-            usaco1: ["15", "3", "100"],
-            usaco2: ["24", "6", "5"],
-            usaco3: ["0 1 2", "1 2 3", "0 1 2"]
+            usaco1: [
+                "15",
+                "3",
+                "100"
+            ],
+            usaco2: [
+                "24",
+                "6",
+                "5"
+            ],
+            usaco3: [
+                "0 1 2",
+                "1 2 3",
+                "0 1 2"
+            ]
         };
 
         function loadProblem() {
             const select = document.getElementById('problemSelect');
+            const problemTitle = document.getElementById('problemTitle');
             const sampleBtns = [
                 document.getElementById('sampleBtn1'),
                 document.getElementById('sampleBtn2'),
@@ -433,11 +692,14 @@ public class Main {
             ];
 
             if (select.value === 'custom') {
+                problemTitle.style.display = 'none';
                 sampleBtns.forEach(btn => btn.disabled = false);
                 return;
             }
 
             if (select.value && problems[select.value]) {
+                problemTitle.textContent = problems[select.value].title;
+                problemTitle.style.display = 'block';
                 if (editor) {
                     editor.setValue(problems[select.value].code);
                 }
@@ -520,6 +782,7 @@ public class Main {
             return div.innerHTML;
         }
 
+        // Load custom by default
         document.getElementById('problemSelect').value = 'custom';
         loadProblem();
     </script>
