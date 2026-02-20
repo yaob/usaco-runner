@@ -1,0 +1,24 @@
+{
+  "name": "java-code-runner",
+  "version": "1.0.0",
+  "description": "Interactive Java Code Runner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "java",
+    "code-runner",
+    "javascript",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
