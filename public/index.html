@@ -1,75 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🚀 USACO Code Runner - Monaco Editor</title>
+    <title>🚀 USACO Code Runner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
-            background: white;
+            background: #1e1e1e;
             border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            height: calc(100vh - 40px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         h2 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
+            color: #ffffff;
+            margin-bottom: 20px;
             font-size: 28px;
+            margin-top: 0;
+            flex-shrink: 0;
         }
 
-        .problem-selector {
-            margin-bottom: 25px;
+        .main-layout {
+            display: grid;
+            grid-template-columns: 650px 1fr;
+            gap: 20px;
+            align-items: stretch;
+            flex-grow: 1;
+            min-height: 0;
+            max-height: 800px;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .right-column {
+            display: grid;
+            grid-template-rows: 1fr 1fr; /* Ensures 50/50 split */
+            height: 100%;
+            min-height: 0;
+            max-height: none;
+            gap: 15px; /* Matches margin-bottom for spacing */
+        }
+
+        #editor-container {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .input-section {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            padding-bottom: 10px;
         }
 
         .input-label {
             display: block;
             font-weight: bold;
-            color: #2c3e50;
+            color: #e0e0e0;
             margin-bottom: 10px;
             font-size: 16px;
         }
 
-        #editor-container {
-            width: 100%;
-            height: 500px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
         .runtime-input-section {
-            margin: 25px 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
             padding: 20px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #444;
             border-radius: 10px;
-            background: #fafafa;
+            background: #2d2d2d;
             transition: border-color 0.3s ease;
         }
 
         .runtime-input-section:hover {
-            border-color: #d0d0d0;
+            border-color: #555;
         }
 
         .runtime-input-label {
             display: flex;
             align-items: center;
             font-weight: bold;
-            color: #2c3e50;
+            color: #e0e0e0;
             margin-bottom: 10px;
             font-size: 16px;
         }
@@ -80,37 +127,29 @@
 
         .runtime-input {
             width: 100%;
-            height: 150px;
+            height: 100%;
+            resize: none;
             padding: 15px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #444;
             border-radius: 8px;
-            resize: vertical;
             box-sizing: border-box;
             transition: all 0.3s ease;
             line-height: 1.5;
-            background: #fafafa;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            flex-grow: 1;
         }
 
         .runtime-input:focus {
             outline: none;
             border-color: #667eea;
-            background: white;
+            background: #252525;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
         .runtime-input::placeholder {
-            color: #999;
-            font-style: italic;
-        }
-
-        .runtime-hint {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-            font-size: 14px;
             color: #666;
             font-style: italic;
         }
@@ -119,7 +158,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin: 30px 0;
+            margin: 15px 0 20px 0;
             flex-wrap: wrap;
         }
 
@@ -180,23 +219,25 @@
         }
 
         .output-section {
-            border: 2px solid #e0e0e0;
+            min-height: 0;
+            border: 2px solid #444;
             border-radius: 10px;
-            padding: 25px;
-            background: #fafafa;
-            min-height: 150px;
-            max-height: 500px;
+            padding: 20px;
+            background: #2d2d2d;
+            min-height: 0;
+            max-height: none;
             overflow-y: auto;
             transition: border-color 0.3s ease;
+            box-sizing: border-box;
         }
 
         .output-section:hover {
-            border-color: #d0d0d0;
+            border-color: #555;
         }
 
         .output-label {
             font-weight: bold;
-            color: #2c3e50;
+            color: #e0e0e0;
             margin-bottom: 15px;
             font-size: 16px;
         }
@@ -207,16 +248,16 @@
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.7;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .error {
-            color: #c62828;
-            background: #ffebee;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
             padding: 15px;
             border-radius: 8px;
             margin: 10px 0;
-            border-left: 4px solid #c62828;
+            border-left: 4px solid #ff6b6b;
         }
 
         .info {
@@ -225,7 +266,7 @@
         }
 
         .success {
-            color: #2e7d32;
+            color: #4ecdc4;
             font-weight: bold;
         }
 
@@ -233,6 +274,7 @@
             text-align: center;
             padding: 20px;
             font-size: 14px;
+            color: #a0a0a0;
         }
 
         .keyboard-hint {
@@ -247,12 +289,13 @@
         }
 
         .kbd {
-            background: white;
+            background: #3d3d3d;
             padding: 2px 8px;
             border-radius: 4px;
             font-family: monospace;
             font-weight: bold;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            color: #e0e0e0;
         }
 
         .problem-title {
@@ -275,16 +318,94 @@
 
         .editor-language {
             font-size: 14px;
-            color: #666;
+            color: #a0a0a0;
             font-weight: 500;
+        }
+
+        .problem-dropdown-container {
+            margin-bottom: 20px;
+        }
+
+        .problem-dropdown-container label {
+            display: block;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #problemSelect {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        #problemSelect:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Sample button overrides for dark theme */
+        button.sample-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        button.sample-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        /* Clear button overrides for dark theme */
+        button.clear-btn {
+            background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        button.clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .problem-dropdown-container label {
+            display: block;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #problemSelect {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        #problemSelect:focus {
+            outline: none;
+            border-color: #667eea;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🚀 USACO Code Runner - Monaco Editor</h2>
+        <h2>🚀 USACO Code Runner</h2>
 
-        <div class="problem-selector">
+        <div class="problem-dropdown-container">
             <label class="input-label">📚 Select USACO Problem:</label>
             <select id="problemSelect" onchange="loadProblem()" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #e0e0e0; border-radius: 8px;">
                 <option value="">-- Select a problem --</option>
@@ -297,23 +418,30 @@
 
         <div id="problemTitle" class="problem-title" style="display: none;"></div>
 
-        <div class="input-section">
-            <label class="input-label">💻 Java Code</label>
-            <div id="editor-container"></div>
-            <div class="editor-controls">
-                <span class="editor-language">Java</span>
+        <div class="main-layout">
+            <!-- Left Column: Code Editor -->
+            <div class="left-column">
+                <div class="input-section">
+                    <div id="editor-container"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="runtime-input-section">
-            <label class="runtime-input-label">
-                <span>📝</span> Runtime Input
-            </label>
-            <textarea id="runtimeInput" class="runtime-input" rows="6" placeholder="Enter input for your Java code (e.g., sample input):
+            <!-- Right Column: Runtime Input and Output -->
+            <div class="right-column">
+                <div class="runtime-input-section">
+                    <label class="runtime-input-label">
+                        <span>📝</span> Runtime Input
+                    </label>
+                    <textarea id="runtimeInput" class="runtime-input" rows="10" placeholder="Enter input for your Java code (e.g., sample input):
 5
 10 4 12 7 15"></textarea>
-            <div class="runtime-hint">
-                <span class="keyboard-hint"><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to run</span>
+                </div>
+
+                <div class="output-section">
+                    <div class="output-label">💻 Output:</div>
+                    <div id="output" class="output-content">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -323,13 +451,6 @@
             <button id="sampleBtn3" class="sample-btn" onclick="loadSample(3)">📥 Load Sample 3</button>
             <button id="runBtn" class="run-btn" onclick="runJavaCode()">▶ Run Code</button>
             <button id="clearBtn" class="clear-btn" onclick="clearOutput()">🗑 Clear Output</button>
-        </div>
-
-        <div class="output-section">
-            <div class="output-label">💻 Output:</div>
-            <div id="output" class="output-content">
-                <span class="status-message" style="color: #667eea;">👋 Select a USACO problem or write your own code. Click "Run Code" or press Ctrl+Enter.</span>
-            </div>
         </div>
     </div>
 
@@ -360,7 +481,7 @@ public class Main {
     }
 }`,
                 language: 'java',
-                theme: 'vs-light',
+                theme: 'vs-dark',
                 automaticLayout: true,
                 minimap: { enabled: true },
                 fontSize: 14,
