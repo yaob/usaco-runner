@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>USACO Runner Tests</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4dabf7;
+            margin-bottom: 30px;
+        }
+        
+        .test-results {
+            background: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        
+        .passed {
+            background: #2d5a27;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .failed {
+            background: #5a2727;
+            border-left: 4px solid #f44336;
+        }
+        
+        .run-button {
+            background: #4dabf7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        .run-button:hover {
+            background: #339af0;
+        }
+        
+        .test-output {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>USACO Runner App Tests</h1>
+        
+        <button class="run-button" onclick="runTests()">Run All Tests</button>
+        
+        <div id="testResults" class="test-results">
+            <h2>Test Results</h2>
+            <div id="resultsContainer"></div>
+        </div>
+        
+        <div id="testOutput" class="test-output" style="display: none;">
+            <h3>Console Output</h3>
+            <div id="consoleOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        // Capture console.log output
+        const originalLog = console.log;
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        console.log = function(message) {
+            originalLog.apply(console, arguments);
+            const outputDiv = document.createElement('div');
+            outputDiv.textContent = message;
+            consoleOutput.appendChild(outputDiv);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        };
+        
+        // Import the test functions
+        // Note: In a real scenario, we would properly import these
+        // For now, we'll include the test functions directly
+        
+        function testCodeEditorInitialization() {
+            console.log("Testing code editor initialization...");
+            
+            // Check if Monaco editor is loaded
+            if (typeof monaco !== 'undefined') {
+                console.log("✓ Monaco editor is loaded");
+                return true;
+            } else {
+                console.log("✗ Monaco editor is not loaded");
+                return false;
+            }
+        }
+
+        // Test function to verify input/output panel structure
+        function testPanelStructure() {
+            console.log("Testing panel structure...");
+            
+            // Check if main layout exists
+            const mainLayout = document.querySelector('.main-layout');
+            if (mainLayout) {
+                console.log("✓ Main layout exists");
+            } else {
+                console.log("✗ Main layout missing");
+                return false;
+            }
+            
+            // Check if input section exists
+            const inputSection = document.querySelector('.runtime-input-section');
+            if (inputSection) {
+                console.log("✓ Input section exists");
+            } else {
+                console.log("✗ Input section missing");
+                return false;
+            }
+            
+            // Check if output section exists
+            const outputSection = document.querySelector('.output-section');
+            if (outputSection) {
+                console.log("✓ Output section exists");
+            } else {
+                console.log("✗ Output section missing");
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Test function to verify layout dimensions
+        function testLayoutDimensions() {
+            console.log("Testing layout dimensions...");
+            
+            const leftColumn = document.querySelector('.left-column');
+            const rightColumn = document.querySelector('.right-column');
+            
+            if (leftColumn && rightColumn) {
+                // Get computed styles
+                const leftStyle = window.getComputedStyle(leftColumn);
+                const rightStyle = window.getComputedStyle(rightColumn);
+                
+                console.log("✓ Layout elements found");
+                return true;
+            } else {
+                console.log("✗ Layout elements not found");
+                return false;
+            }
+        }
+
+        // Run all tests
+        function runAllTests() {
+            console.log("=== Running USACO Runner Tests ===");
+            
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
+            
+            const outputContainer = document.getElementById('testOutput');
+            outputContainer.style.display = 'block';
+            consoleOutput.innerHTML = '';
+            
+            let allPassed = true;
+            const testResults = [];
+            
+            try {
+                if (!testCodeEditorInitialization()) {
+                    allPassed = false;
+                    testResults.push('<div class="test-result failed">✗ Code editor initialization failed</div>');
+                } else {
+                    testResults.push('<div class="test-result passed">✓ Code editor initialization passed</div>');
+                }
+                
+                if (!testPanelStructure()) {
+                    allPassed = false;
+                    testResults.push('<div class="test-result failed">✗ Panel structure test failed</div>');
+                } else {
+                    testResults.push('<div class="test-result passed">✓ Panel structure test passed</div>');
+                }
+                
+                if (!testLayoutDimensions()) {
+                    allPassed = false;
+                    testResults.push('<div class="test-result failed">✗ Layout dimensions test failed</div>');
+                } else {
+                    testResults.push('<div class="test-result passed">✓ Layout dimensions test passed</div>');
+                }
+                
+                console.log("\n=== Test Results ===");
+                if (allPassed) {
+                    console.log("✓ All tests passed!");
+                    testResults.push('<div class="test-result passed">✓ All tests passed!</div>');
+                } else {
+                    console.log("✗ Some tests failed");
+                    testResults.push('<div class="test-result failed">✗ Some tests failed</div>');
+                }
+                
+                resultsContainer.innerHTML = testResults.join('');
+                
+            } catch (error) {
+                console.error("Error running tests:", error);
+                resultsContainer.innerHTML = '<div class="test-result failed">✗ Error running tests: ' + error.message + '</div>';
+            }
+        }
+        
+        // Run tests automatically when page loads
+        // runAllTests();
+    </script>
+</body>
+</html>

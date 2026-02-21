@@ -1,0 +1,23 @@
+{
+  "name": "usaco-runner-tests",
+  "version": "1.0.0",
+  "description": "Tests for the USACO Runner application",
+  "main": "app-tests.js",
+  "scripts": {
+    "test": "node test-runner.js",
+    "test:browser": "open tests/test-runner.html"
+  },
+  "keywords": [
+    "usaco",
+    "runner",
+    "tests",
+    "javascript",
+    "java"
+  ],
+  "author": "USACO Runner Team",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "chai": "^4.3.7"
+  }
+}
